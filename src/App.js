@@ -21,7 +21,7 @@ function App() {
   // }
 
   useEffect(() => {
-    
+
     const tempCells = [];
     let key = 0;
     for (let row = 0; row < numRow; row++) {
@@ -32,22 +32,22 @@ function App() {
       }
       tempCells.push(currentRow);
     }
-    
+
     console.log(tempCells);
     setCells(tempCells);
 
   }, [])
 
 
-  const ClearGridValues = () =>{
+  const ClearGridValues = () => {
     const newGrid = [...cells];
-    
 
-    newGrid.forEach((row)=>{
-      row.forEach((cell)=>{
-          cell.actualValue = 0;
-          cell.guessedValue = 0;
-          cell.isGiven = false;
+
+    newGrid.forEach((row) => {
+      row.forEach((cell) => {
+        cell.actualValue = 0;
+        cell.guessedValue = 0;
+        cell.isGiven = false;
       });
     });
     setCells(newGrid);
@@ -58,9 +58,9 @@ function App() {
     ClearGridValues();
     const newGrid = [...cells];
 
-    newGrid.forEach((row)=>{
-      row.forEach((cell)=>{
-        if(values[cell.key] !== 0){
+    newGrid.forEach((row) => {
+      row.forEach((cell) => {
+        if (values[cell.key] !== 0) {
           cell.actualValue = values[cell.key];
           cell.isGiven = true;
         }
@@ -69,19 +69,49 @@ function App() {
     setCells(newGrid);
   }
 
-// row.find( cell => cell.key === _key)
+
+  const ReplaceCellByCoord = (_cell) => {
+    let newCells = [ ...cells ];
+    let newCell = newCells[_cell.y][_cell.x];
+    //newCell = { ..._cell };
+    setCells(newCells);
+  }
+
+  const GetCellByCoord = (_cells, x, y) => {
+    return _cells[y][x];
+  }
+
+
+  const handleMouseOver = (_cell) =>{
+    const newCells = [ ...cells];
+    console.log("mouseHover");
+
+    let square = GridFunc.returnSquareKeys(_cell);
+    newCells.forEach((row)=>{row.forEach((cell)=>{cell.highlighted=false})});
+    square.forEach((coords) =>{
+      const cellToUpdate = GetCellByCoord(newCells, coords[0], coords[1]);
+      cellToUpdate.highlighted = true;
+    })
+
+    GridFunc.returnEntireColCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
+    GridFunc.returnEntireRowCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
+    
+    setCells(newCells);
+  }
+
+  // row.find( cell => cell.key === _key)
   const handleClickOnCell = (event, _key, isRightClick = false) => {
     event.preventDefault();
     let newCells = [...cells];
-    
+
     let clickedCell = null;
     newCells.forEach(row => {
-      const search = row.find( cell => cell.key === _key) ;
+      const search = row.find(cell => cell.key === _key);
       if (search) clickedCell = search;
     });
-    
-    if(clickedCell != null){
-      console.log(clickedCell);
+
+    if (clickedCell != null) {
+      //console.log(clickedCell);
       //calc new cell value
       let newCellValue = clickedCell.guessedValue + (isRightClick ? -1 : 1);
       newCellValue < 0 && (newCellValue = 9);
@@ -91,35 +121,32 @@ function App() {
       clickedCell.guessedValue = newCellValue;
       setCells(newCells);
 
-      
       //GridFunc.returnEntireRowKeys(clickedCell);
-
-      let test = GridFunc.returnEntireColCells(cells,clickedCell)
-      console.log(test);
+  
     }
 
 
 
 
-    
+
   }
 
   return (
     <div className="App">
 
-
-      {
-        cells.map((row, rowId) => {
-          return (
-            <div key={rowId*100}> 
-              {row.map((cell, cellId)=><CellDisplay key={cell.key}  cell={cell} handleClickOnCell={handleClickOnCell}/>)}
+      <div className="grid">
+        {
+          cells.map((row, rowId) => {
+            return (
+              <div key={rowId * 100}>
+                {row.map((cell, cellId) => <CellDisplay key={cell.key} cell={cell} handleClickOnCell={handleClickOnCell} handleMouseOver={handleMouseOver}/>)}
               </div>
-          )
-        })
-      }
-
-      <button onClick={()=>{LoadGridValues(GridValues.arrayA)}}>Load default values</button>
-      <button onClick={()=>{ClearGridValues()}}>Clear all</button>
+            )
+          })
+        }
+      </div>
+      <button onClick={() => { LoadGridValues(GridValues.arrayA) }}>Load default values</button>
+      <button onClick={() => { ClearGridValues() }}>Clear all</button>
 
     </div>
   );

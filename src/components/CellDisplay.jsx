@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-function Cell({ cell, handleClickOnCell }) {
+function Cell({ cell, handleClickOnCell,handleMouseOver }) {
   const [clickedOn, setClickedOn] = useState(false);
 
   const handleClick = (e, isRightClick = false) => {
@@ -9,19 +9,21 @@ function Cell({ cell, handleClickOnCell }) {
   };
 
   const displayCellValue = () => {
-    if (cell.isGiven)
+    if (cell.isGiven){
+      const cellClass = "cell isGiven " + (cell.highlighted ? " highlighted" : "");
       return (
-        <div className="cell isGiven">
+        <div className={cellClass}>
           <span className="cell-number">{cell.actualValue}</span>
         </div>
       );
-      
+    }
 
     else {
-      const cellClass = "cell notGiven " + (clickedOn ? " clicked" : "");
+      const cellClass = "cell notGiven " + (clickedOn ? " clicked" : "") + (cell.highlighted ? " highlighted" : "");
       return (
         <div
           className={cellClass}
+          onMouseOver={() => {handleMouseOver(cell)}}
           onTransitionEnd={() => {setClickedOn(false)}}
           onClick={(e) => {
             handleClick(e);

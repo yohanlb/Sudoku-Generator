@@ -41,4 +41,24 @@ export const returnEntireColCells = (cells, cell) => {
 }
 
 
+export const returnSquareKeys = (cell) => {
+    const dx = Math.floor(cell.x / 3 );
+    const dy = Math.floor(cell.y / 3 );
+    const rx = cell.x % 3;
+    const ry = cell.y % 3;
+
+    const square =[
+        [dx*3+0, dy*3+0],[dx*3+1, dy*3+0],[dx*3+2, dy*3+0], 
+        [dx*3+0, dy*3+1],[dx*3+1, dy*3+1],[dx*3+2, dy*3+1],
+        [dx*3+0, dy*3+2],[dx*3+1, dy*3+2],[dx*3+2, dy*3+2] 
+     ]
+    
+
+    return(square);
+}
+
+export const getCellByCoord = (cells, x, y) => {
+
+}
+
 
