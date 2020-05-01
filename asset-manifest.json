@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/yohanlb/Sudoku/static/css/main.70c01e29.chunk.css",
+    "main.js": "/yohanlb/Sudoku/static/js/main.2f3ed58c.chunk.js",
+    "main.js.map": "/yohanlb/Sudoku/static/js/main.2f3ed58c.chunk.js.map",
+    "runtime-main.js": "/yohanlb/Sudoku/static/js/runtime-main.ae864c80.js",
+    "runtime-main.js.map": "/yohanlb/Sudoku/static/js/runtime-main.ae864c80.js.map",
+    "static/js/2.5aad7fc7.chunk.js": "/yohanlb/Sudoku/static/js/2.5aad7fc7.chunk.js",
+    "static/js/2.5aad7fc7.chunk.js.map": "/yohanlb/Sudoku/static/js/2.5aad7fc7.chunk.js.map",
+    "index.html": "/yohanlb/Sudoku/index.html",
+    "precache-manifest.d06e32c1eb77374e48d589b920a973c9.js": "/yohanlb/Sudoku/precache-manifest.d06e32c1eb77374e48d589b920a973c9.js",
+    "service-worker.js": "/yohanlb/Sudoku/service-worker.js",
+    "static/css/main.70c01e29.chunk.css.map": "/yohanlb/Sudoku/static/css/main.70c01e29.chunk.css.map",
+    "static/js/2.5aad7fc7.chunk.js.LICENSE.txt": "/yohanlb/Sudoku/static/js/2.5aad7fc7.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.ae864c80.js",
+    "static/js/2.5aad7fc7.chunk.js",
+    "static/css/main.70c01e29.chunk.css",
+    "static/js/main.2f3ed58c.chunk.js"
+  ]
+}
