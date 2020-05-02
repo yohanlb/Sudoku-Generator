@@ -5,6 +5,8 @@ import * as GridFunc from './grid-helper-functions.js';
 import * as GridValues from './gridValues.js';
 
 import './App.css';
+import PossibleValues from './components/PossibleValues';
+import SolverResult from './components/SolverResult';
 
 function App() {
 
@@ -14,6 +16,8 @@ function App() {
   // let cells = [];
 
   const [cells, setCells] = useState([]);
+  const [possibleValues, setPossibleValues] = useState([]);
+  const [solverResult, setSolverResult] = useState("");
 
   // const addCell = (newCell) =>{
   //   console.log("Adding cell : ", newCell);
@@ -34,14 +38,14 @@ function App() {
     }
 
     console.log(tempCells);
+    LoadGridValues(tempCells, GridValues.arrayA)
     setCells(tempCells);
 
   }, [])
 
 
-  const ClearGridValues = () => {
-    const newGrid = [...cells];
-
+  const ClearGridValues = (_cells) => {
+    const newGrid = [..._cells];
 
     newGrid.forEach((row) => {
       row.forEach((cell) => {
@@ -50,14 +54,14 @@ function App() {
         cell.isGiven = false;
       });
     });
-    setCells(newGrid);
+    return newGrid;
 
   }
 
-  const LoadGridValues = (values) => {
-    ClearGridValues();
-    const newGrid = [...cells];
+  const LoadGridValues = (_cells, values) => {
+    let newGrid = [..._cells];
 
+    newGrid = ClearGridValues(newGrid);
     newGrid.forEach((row) => {
       row.forEach((cell) => {
         if (values[cell.key] !== 0) {
@@ -66,33 +70,35 @@ function App() {
         }
       });
     });
-    setCells(newGrid);
+    return newGrid
+    //setCells(newGrid);
   }
 
 
-  const ReplaceCellByCoord = (_cell) => {
-    let newCells = [ ...cells ];
-    let newCell = newCells[_cell.y][_cell.x];
-    //newCell = { ..._cell };
-    setCells(newCells);
+  const Solve = () =>{
+    const solverResult = GridFunc.solver(cells)
+    
+    setCells(solverResult[0]);
+    setSolverResult(solverResult[1]);
   }
 
-  const GetCellByCoord = (_cells, x, y) => {
-    return _cells[y][x];
+  const handleMouseLeaveGrid = () => {
+    setPossibleValues([]);
   }
-
 
   const handleMouseOver = (_cell) =>{
     const newCells = [ ...cells];
-    console.log("mouseHover");
+    //console.log("mouseOver");
 
-    let square = GridFunc.returnSquareKeys(_cell);
-    newCells.forEach((row)=>{row.forEach((cell)=>{cell.highlighted=false})});
-    square.forEach((coords) =>{
-      const cellToUpdate = GetCellByCoord(newCells, coords[0], coords[1]);
-      cellToUpdate.highlighted = true;
-    })
+    const possibleVal = GridFunc.getPossibleValuesForCell(newCells, _cell);
+    setPossibleValues(possibleVal);
 
+    newCells.forEach((row) => {
+      row.forEach((cell) => {
+        cell.highlighted= false;
+      });
+    });
+    GridFunc.returnSquareCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
     GridFunc.returnEntireColCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
     GridFunc.returnEntireRowCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
     
@@ -134,19 +140,22 @@ function App() {
   return (
     <div className="App">
 
-      <div className="grid">
+      <div className="grid" onMouseLeave={handleMouseLeaveGrid}>
         {
           cells.map((row, rowId) => {
             return (
-              <div key={rowId * 100}>
+              <div className="row" key={rowId * 100}>
                 {row.map((cell, cellId) => <CellDisplay key={cell.key} cell={cell} handleClickOnCell={handleClickOnCell} handleMouseOver={handleMouseOver}/>)}
               </div>
             )
           })
         }
       </div>
-      <button onClick={() => { LoadGridValues(GridValues.arrayA) }}>Load default values</button>
-      <button onClick={() => { ClearGridValues() }}>Clear all</button>
+      <button onClick={() => { setCells(LoadGridValues(cells, GridValues.arrayA)) }}>Load default values</button>
+      <button onClick={() => { setCells(ClearGridValues(cells)) }}>Clear all</button>
+      <button onClick={() => { Solve() }}>Solve</button>
+      <PossibleValues possibleValues={possibleValues}/>
+      <SolverResult solverResult={solverResult} />
 
     </div>
   );

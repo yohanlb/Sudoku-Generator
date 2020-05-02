@@ -1,5 +1,21 @@
-.grid{
+.App{
+    height: 100vh;
+    width: 100vh;
+    margin: 0;
+
+    
 }
+
+
+.grid{
+    display: inline;
+}
+.row{
+    /* margin: auto; */
+    width: max-content;
+
+}
+
 
 .cell{
     position: relative;
@@ -37,6 +53,10 @@
     font-weight: bolder;
     cursor: not-allowed;
 }
+.isSolved{
+    color: green;
+}
+
 .notGiven{
     font-size: 1.3em;
     color: #777;

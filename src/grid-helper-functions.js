@@ -34,31 +34,142 @@ export const returnEntireRowCells = (cells, cell) => {
 export const returnEntireColCells = (cells, cell) => {
     const res = [];
     cells.forEach(
-        (row)=>{ res.push(row[cell.x])}
+        (row) => { res.push(row[cell.x]) }
     )
     return res;
 
 }
 
+export const coordToKey = (x ,y) => {
+    return ( 9*y + x);
+}
 
 export const returnSquareKeys = (cell) => {
-    const dx = Math.floor(cell.x / 3 );
-    const dy = Math.floor(cell.y / 3 );
-    const rx = cell.x % 3;
-    const ry = cell.y % 3;
+    const dx = Math.floor(cell.x / 3);
+    const dy = Math.floor(cell.y / 3);
 
-    const square =[
-        [dx*3+0, dy*3+0],[dx*3+1, dy*3+0],[dx*3+2, dy*3+0], 
-        [dx*3+0, dy*3+1],[dx*3+1, dy*3+1],[dx*3+2, dy*3+1],
-        [dx*3+0, dy*3+2],[dx*3+1, dy*3+2],[dx*3+2, dy*3+2] 
-     ]
+    const squareCoords = [
+        [dx * 3 + 0, dy * 3 + 0], [dx * 3 + 1, dy * 3 + 0], [dx * 3 + 2, dy * 3 + 0],
+        [dx * 3 + 0, dy * 3 + 1], [dx * 3 + 1, dy * 3 + 1], [dx * 3 + 2, dy * 3 + 1],
+        [dx * 3 + 0, dy * 3 + 2], [dx * 3 + 1, dy * 3 + 2], [dx * 3 + 2, dy * 3 + 2]
+    ]
+
+    const squareKeys = []
     
+    squareCoords.forEach((cellCoords) => {
+        squareKeys.push(coordToKey(cellCoords[0], cellCoords[1]));
+    }) 
 
-    return(square);
+    return (squareKeys);
 }
 
-export const getCellByCoord = (cells, x, y) => {
 
+
+export const getSeveralCellByKey = (cells, keys) => {
+    const res = [] 
+    cells.forEach((row)=>{
+        row.forEach((cell) =>{
+            const isSearched = keys.some((key)=>key ===  cell.key)
+            if (isSearched) {res.push(cell);}
+            
+        })
+    })
+    
+    return res;
+}
+
+export const returnSquareCells = (cells, cell) => {
+    const keys = returnSquareKeys(cell);
+    return getSeveralCellByKey (cells, keys) ;
 }
 
 
+
+
+export const getPossibleValuesForCell = (cells, cell, considerGuessedValues = true) => {
+    const valuesAvailability = new Array(9).fill(1);
+    
+    //get all the cells in range of the selected one
+    let cellsInRange = []
+    cellsInRange = cellsInRange.concat(returnSquareCells(cells, cell));
+    cellsInRange = cellsInRange.concat(returnEntireRowCells(cells, cell));
+    cellsInRange = cellsInRange.concat(returnEntireColCells(cells, cell));
+
+    //filter out the selected cell
+    cellsInRange = cellsInRange.filter((item)=>item.key !== cell.key);
+
+    //find which values are already used among all the cells in range
+    cellsInRange.forEach((el)=>{
+        if(el.actualValue > 0) valuesAvailability[el.actualValue-1] = 0; 
+        else if(considerGuessedValues && el.guessedValue > 0) valuesAvailability[el.guessedValue-1] = 0;
+    })
+
+    // create an array with only the available values
+    const possibleValues = [];
+    valuesAvailability.forEach((el,i) => {
+        if(el){possibleValues.push(i+1)}
+        //index goes from 0 to 8, but we want to return 1 to 9
+    });
+
+
+    return possibleValues;
+}
+
+
+export const solverLoop = (solvedCells, nbOfGuessAllowed) =>{
+    let nbOfValueFound = 0;
+    let nbOfCellWithSeveralPossibilites = 0;
+
+    solvedCells.forEach(row => {
+        row.forEach(cell => {
+            //console.log(cell.key);
+            if (cell.actualValue === 0) {
+                const possibleValues = getPossibleValuesForCell(solvedCells, cell);
+                if (possibleValues.length === 0) {
+                    console.log("Can't solve cell ", cell.key);
+                    return;
+                }
+                if (possibleValues.length === 1) {
+                    cell.actualValue = possibleValues[0];
+                    //console.log("new value for cell " , cell.key);
+                    nbOfValueFound ++;
+                }
+                if (possibleValues.length > 1){
+                    nbOfCellWithSeveralPossibilites ++;
+                }
+            }
+        })
+    })
+
+    return [nbOfValueFound, nbOfCellWithSeveralPossibilites];
+}
+
+export const solver = (cells) => {
+    let solvedCells = [ ...cells]
+    let nbOfValueFound = 0;
+    let nbOfCellRemaining = 9*9;
+    let nbOfGuessAllowed = 0;
+    let status = "";
+
+    let loopCount = 0;
+
+    while (nbOfCellRemaining > 0 && loopCount < 100){
+        
+        const loopRes = solverLoop(solvedCells, nbOfGuessAllowed);
+        nbOfValueFound = loopRes[0]
+        if( nbOfValueFound ===0) 
+        {
+            console.log("break");
+            status = "Couldn't resolve with simple solver."
+            break;
+        }
+        nbOfCellRemaining = loopRes[1];
+
+        console.log("loop count : " , loopCount);
+        loopCount ++;
+
+    }
+    if(nbOfCellRemaining === 0) status = "Solved in " + loopCount + " loops.";
+    
+    return [solvedCells, status];
+}

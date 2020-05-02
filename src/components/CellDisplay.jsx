@@ -18,6 +18,15 @@ function Cell({ cell, handleClickOnCell,handleMouseOver }) {
       );
     }
 
+    else if(cell.actualValue > 0){
+      const cellClass = "cell isSolved " + (cell.highlighted ? " highlighted" : "");
+      return (
+        <div className={cellClass}>
+          <span className="cell-number">{cell.actualValue}</span>
+        </div>
+      );
+    }
+
     else {
       const cellClass = "cell notGiven " + (clickedOn ? " clicked" : "") + (cell.highlighted ? " highlighted" : "");
       return (
