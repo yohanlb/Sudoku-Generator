@@ -1,4 +1,4 @@
-Sudoko game and with solver
+Sudoko generator and solver
 
 made with React
 
