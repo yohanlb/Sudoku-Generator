@@ -1,2 +1,0 @@
-.cell{position:relative;width:50px;height:50px;background-color:coral;border:1px solid #000;text-align:center;vertical-align:middle;display:table-cell;cursor:pointer;z-index:1;-webkit-transform:scale(1);transform:scale(1);transition:all .05s ease-out}.clicked{background-color:#ff5a1e;-webkit-transform:scale(1.2);transform:scale(1.2);z-index:10}.cell-number{font-size:1.2em;font-weight:500}.isGiven{font-size:1.3em;font-weight:bolder;cursor:not-allowed}.notGiven{font-size:1.3em;color:#777}.highlighted{background-color:#9b2900}
-/*# sourceMappingURL=main.20c137e8.chunk.css.map */
