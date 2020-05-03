@@ -82,6 +82,13 @@ function App() {
     setSolverResult(solverResult[1]);
   }
 
+  const SolveBacktracking = () => {
+    const solverResult = GridFunc.sovlerWithBackTracking(cells)
+    
+    setCells(solverResult[0]);
+    setSolverResult(solverResult[1]);
+  }
+
   const handleMouseLeaveGrid = () => {
     setPossibleValues([]);
   }
@@ -154,6 +161,7 @@ function App() {
       <button onClick={() => { setCells(LoadGridValues(cells, GridValues.arrayA)) }}>Load default values</button>
       <button onClick={() => { setCells(ClearGridValues(cells)) }}>Clear all</button>
       <button onClick={() => { Solve() }}>Solve</button>
+      <button onClick={() => { SolveBacktracking() }}>Solve with backtracking</button>
       <PossibleValues possibleValues={possibleValues}/>
       <SolverResult solverResult={solverResult} />
 

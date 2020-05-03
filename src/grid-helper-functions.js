@@ -43,6 +43,11 @@ export const returnEntireColCells = (cells, cell) => {
 export const coordToKey = (x ,y) => {
     return ( 9*y + x);
 }
+export const KeyToCoord = (key) => {
+    return ([key%9,Math.floor(key/9)] );
+}
+
+
 
 export const returnSquareKeys = (cell) => {
     const dx = Math.floor(cell.x / 3);
@@ -172,4 +177,40 @@ export const solver = (cells) => {
     if(nbOfCellRemaining === 0) status = "Solved in " + loopCount + " loops.";
     
     return [solvedCells, status];
+}
+
+
+
+// return -1 if nothing to solve
+// 0->80 if key found
+export const getNextCellToSolve = (_cells, _cell) => {
+    let keyToFind = _cell.key+1 >= 9*9 ? 0 : _cell.key+1;
+    console.log(_cell.key, keyToFind);
+    const maxLoop = 9*9;
+    let i = 0;
+    while(i < maxLoop){
+        const coords = KeyToCoord(keyToFind);
+        console.log("coords : "+ coords);
+        const cellToCheck = _cells[coords[1]][coords[0]];
+        
+        if(cellToCheck.actualValue <= 0){
+            return cellToCheck
+        }
+
+        keyToFind = keyToFind+1 >= 9*9 ? 0 : keyToFind+1;
+        i++;
+    }
+    return -1;
+}
+
+
+export const sovlerWithBackTracking = (_cells) =>{
+    let solvedCells = [ ..._cells]
+
+    let cellToSolve = getNextCellToSolve(_cells, _cells[2][5]);
+    console.log("key to solve : ", cellToSolve);
+    //let pValues = getPossibleValuesForCell(solvedCells, cell);
+
+
+    return [solvedCells, "cellToSolve : " + cellToSolve.key];
 }
