@@ -237,43 +237,65 @@ export const recursiveValidation = (_cells, key) => {
 
 
 
-export const sovlerWithBackTracking = (_cells) =>{
-    const solvedCells = [ ..._cells];
- 
+export const sovlerWithBackTracking = (_cells, addToHistory, stepByStep = false) =>{
+    const newCells = JSON.parse(JSON.stringify(_cells));
+    
     let res;
-    res = recursiveValidation(solvedCells, 0);
+    if(stepByStep){
+        res = recursiveValidationStepByStep(newCells, 0, addToHistory);
+    }
+    else{
+        res = recursiveValidation(newCells, 0);
 
-    return [solvedCells, "Solved ? " , res];
+    }
+    //UpdateCells(newCells);
+    const resString = res ? "Solved with success" : "Error"
+    return [newCells, resString];
 }
 
 
-/*
-export const RecursiveValidationWithDelay = (_cells, key, UpdateCells) => {
-    const useGuessedValues = true;
-    if (key >= 9 * 9) { return true }  //Solving finished
+export const recursiveValidationStepByStep = (_cells, key, addToHistory) => {
 
+    const useGuessedValues = true;
+    //console.log("key : ", key);
+    if (key >= 9 * 9) { return true }  //Solving finished
 
     const coords = KeyToCoord(key);
     const currentCell = _cells[coords[1]][coords[0]];
     if (currentCell.actualValue > 0 || (useGuessedValues && currentCell.guessedValue > 0)) {
         // this cell is already solved, go to next cell
-        return RecursiveValidationWithDelay(_cells, key + 1, UpdateCells);
+        return recursiveValidationStepByStep(_cells, key + 1, addToHistory);
     }
+
 
 
     const pValues = getPossibleValuesForCell(_cells, currentCell);
     for (let v = 1; v <= 9; v++) {
+        //console.log("key : ", currentCell.key, "v :  ", v, "pValues : ", pValues);
         if (pValues.some(e=> e === v)){
             currentCell.actualValue = v;
+            
+            addToHistory( {
+                key:currentCell.key,
+                actualValue:v
+            } )
+
             // try to resolve the rest of the array with this value for the current cell
-            if ( RecursiveValidationWithDelay (_cells, key+1, UpdateCells) ) {
-                return true;  
-            }
+            if ( recursiveValidationStepByStep (_cells, key+1, addToHistory) )
+                return true; 
         }
+
     }
 
     currentCell.actualValue = 0 ; // no value possible for this cell, reset it to 0.
     return false // this grill is not solvable, going back to previous recursion.
 }
 
-*/
+
+export const sleep = (ms) => {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+      currentDate = Date.now();
+    } while (currentDate - date < ms);
+  }

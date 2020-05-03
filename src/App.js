@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import CellDisplay from './components/CellDisplay';
 import Cell from './components/Cell';
 import * as GridFunc from './grid-helper-functions.js';
@@ -8,20 +8,53 @@ import './App.css';
 import PossibleValues from './components/PossibleValues';
 import SolverResult from './components/SolverResult';
 
+let history = [];
+
 function App() {
 
   const numRow = 9;
   const numCol = 9;
 
 
+
   const [cells, setCells] = useState([]);
   const [possibleValues, setPossibleValues] = useState([]);
   const [solverResult, setSolverResult] = useState("");
+  //const [history, setHistory ] = useState([]);
 
+ 
+
+  useInterval(() => {
+    Tick()
+  }, 50);
+
+  
+  const Tick = () => {
+
+
+    // PLAY HISTORY
+    if(history.length > 0){
+      const newCells = JSON.parse(JSON.stringify(cells));
+
+      const [x, y] = GridFunc.KeyToCoord(history[0].key);
+      newCells[y][x].actualValue = history[0].actualValue ;
+      UpdateCells(newCells)
+      history.shift()
+
+    } 
+
+  }
+
+  
+
+   
+  const addToHistory = (_newStep) =>{
+    history = history.concat(_newStep);
+  }
 
   useEffect(() => {
 
-    const tempCells = [];
+    let tempCells = [];
     let key = 0;
     for (let row = 0; row < numRow; row++) {
       const currentRow = [];
@@ -33,15 +66,16 @@ function App() {
     }
 
     console.log(tempCells);
-    LoadGridValues(tempCells, GridValues.arrayA)
+    tempCells = LoadGridValues(tempCells, GridValues.arrayA)
     setCells(tempCells);
+
 
   }, [])
 
 
   const ClearGridValues = (_cells) => {
-    let newCells = JSON.parse(JSON.stringify(cells));
-
+    let newCells = JSON.parse(JSON.stringify(_cells));
+    history = []; //clear history
     newCells.forEach((row) => {
       row.forEach((cell) => {
         cell.actualValue = 0;
@@ -54,8 +88,8 @@ function App() {
   }
 
   const LoadGridValues = (_cells, values) => {
-    let newCells = JSON.parse(JSON.stringify(cells));
-
+    let newCells = JSON.parse(JSON.stringify(_cells));
+    history = []; //clear history
     newCells = ClearGridValues(newCells);
     newCells.forEach((row) => {
       row.forEach((cell) => {
@@ -69,8 +103,8 @@ function App() {
   }
 
   const UpdateCells = (_cells) =>{
-    console.log("updating cells")
     setCells(_cells);
+
   }
 
   
@@ -82,11 +116,13 @@ function App() {
   }
   
 
-  const SolveBacktracking = () => {
+  const SolveBacktracking = (stepByStep = false) => {
     const newCells = JSON.parse(JSON.stringify(cells));
-    const solverResult = GridFunc.sovlerWithBackTracking(newCells, UpdateCells)
-    
-    setCells(solverResult[0]);
+    const solverResult = GridFunc.sovlerWithBackTracking(newCells, addToHistory, stepByStep)
+
+    if(!stepByStep){
+      setCells(solverResult[0]);
+    }
     setSolverResult(solverResult[1]);
   }
 
@@ -96,7 +132,6 @@ function App() {
 
   const handleMouseOver = (_cell) =>{
     const newCells = JSON.parse(JSON.stringify(cells));
-    console.log("mouseOver");
 
     const possibleVal = GridFunc.getPossibleValuesForCell(newCells, _cell);
     setPossibleValues(possibleVal);
@@ -164,8 +199,8 @@ function App() {
       </div>
       <button onClick={() => { setCells(LoadGridValues(cells, GridValues.arrayA)) }}>Load default values</button>
       <button onClick={() => { setCells(ClearGridValues(cells)) }}>Clear all</button>
-      <button onClick={() => { Solve() }}>Solve</button>
-      <button onClick={() => { SolveBacktracking() }}>Solve with backtracking</button>
+      <button onClick={() => { SolveBacktracking(false) }}>Solve</button>
+      <button onClick={() => { SolveBacktracking(true) }}>Solve (step by step)</button>
       <PossibleValues possibleValues={possibleValues}/>
       <SolverResult solverResult={solverResult} />
 
@@ -174,3 +209,28 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
+
+  // Se souvenir de la dernière fonction de rappel.
+  useEffect(() => {
+    savedCallback.current = callback;
+  });
+
+  // Configurer l’intervalle.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}

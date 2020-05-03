@@ -1,3 +1,9 @@
+@keyframes solve {
+    0% {transform: scale(1.5); z-index: 10;}
+    100% { transform: scale(1); z-index: 1;}
+  }
+
+
 .App{
     height: 100vh;
     width: 100vh;
@@ -46,16 +52,23 @@
 .cell-number{
     font-size: 1.2em;
     font-weight: 500;
+
+    transform: scale(1);
+    transition: all 0.2s ease-out;
+
 }
+
 
 .isGiven{
     font-size: 1.3em;
     font-weight: bolder;
-    cursor: not-allowed;
+    cursor: text;
 }
-.isSolved{
-    color: green;
+.isSolved {
+    animation: 0.1s linear 0s solve;
+    background-color: lightgreen;
 }
+
 
 .notGiven{
     font-size: 1.3em;

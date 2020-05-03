@@ -12,7 +12,10 @@ function Cell({ cell, handleClickOnCell,handleMouseOver }) {
     if (cell.isGiven){
       const cellClass = "cell isGiven " + (cell.highlighted ? " highlighted" : "");
       return (
-        <div className={cellClass}>
+        <div 
+        className={cellClass}
+        onMouseOver={() => {handleMouseOver(cell)}}
+        >
           <span className="cell-number">{cell.actualValue}</span>
         </div>
       );
@@ -21,7 +24,10 @@ function Cell({ cell, handleClickOnCell,handleMouseOver }) {
     else if(cell.actualValue > 0){
       const cellClass = "cell isSolved " + (cell.highlighted ? " highlighted" : "");
       return (
-        <div className={cellClass}>
+        <div 
+          className={cellClass}
+          onMouseOver={() => {handleMouseOver(cell)}}
+        >
           <span className="cell-number">{cell.actualValue}</span>
         </div>
       );
