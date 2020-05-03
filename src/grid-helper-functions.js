@@ -157,7 +157,6 @@ export const solver = (cells) => {
     let status = "";
 
     let loopCount = 0;
-
     while (nbOfCellRemaining > 0 && loopCount < 100){
         
         const loopRes = solverLoop(solvedCells, nbOfGuessAllowed);
@@ -204,13 +203,77 @@ export const getNextCellToSolve = (_cells, _cell) => {
 }
 
 
-export const sovlerWithBackTracking = (_cells) =>{
-    let solvedCells = [ ..._cells]
-
-    let cellToSolve = getNextCellToSolve(_cells, _cells[2][5]);
-    console.log("key to solve : ", cellToSolve);
-    //let pValues = getPossibleValuesForCell(solvedCells, cell);
 
 
-    return [solvedCells, "cellToSolve : " + cellToSolve.key];
+export const recursiveValidation = (_cells, key) => {
+    const tempCells = [ ..._cells];
+
+    const useGuessedValues = true;
+    //console.log("key : ", key);
+    if (key >= 9 * 9) { return true }  //Solving finished
+
+    const coords = KeyToCoord(key);
+    const currentCell = tempCells[coords[1]][coords[0]];
+    if (currentCell.actualValue > 0 || (useGuessedValues && currentCell.guessedValue > 0)) {
+        // this cell is already solved, go to next cell
+        return recursiveValidation(tempCells, key + 1);
+    }
+
+    const pValues = getPossibleValuesForCell(tempCells, currentCell);
+    for (let v = 1; v <= 9; v++) {
+        //console.log("key : ", currentCell.key, "v :  ", v, "pValues : ", pValues);
+        if (pValues.some(e=> e === v)){
+            currentCell.actualValue = v;
+            // try to resolve the rest of the array with this value for the current cell
+            if ( recursiveValidation (tempCells, key+1) )
+                return true; 
+        }
+
+    }
+
+    currentCell.actualValue = 0 ; // no value possible for this cell, reset it to 0.
+    return false // this grill is not solvable, going back to previous recursion.
 }
+
+
+
+export const sovlerWithBackTracking = (_cells) =>{
+    const solvedCells = [ ..._cells];
+ 
+    let res;
+    res = recursiveValidation(solvedCells, 0);
+
+    return [solvedCells, "Solved ? " , res];
+}
+
+
+/*
+export const RecursiveValidationWithDelay = (_cells, key, UpdateCells) => {
+    const useGuessedValues = true;
+    if (key >= 9 * 9) { return true }  //Solving finished
+
+
+    const coords = KeyToCoord(key);
+    const currentCell = _cells[coords[1]][coords[0]];
+    if (currentCell.actualValue > 0 || (useGuessedValues && currentCell.guessedValue > 0)) {
+        // this cell is already solved, go to next cell
+        return RecursiveValidationWithDelay(_cells, key + 1, UpdateCells);
+    }
+
+
+    const pValues = getPossibleValuesForCell(_cells, currentCell);
+    for (let v = 1; v <= 9; v++) {
+        if (pValues.some(e=> e === v)){
+            currentCell.actualValue = v;
+            // try to resolve the rest of the array with this value for the current cell
+            if ( RecursiveValidationWithDelay (_cells, key+1, UpdateCells) ) {
+                return true;  
+            }
+        }
+    }
+
+    currentCell.actualValue = 0 ; // no value possible for this cell, reset it to 0.
+    return false // this grill is not solvable, going back to previous recursion.
+}
+
+*/
