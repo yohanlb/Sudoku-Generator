@@ -188,15 +188,24 @@ function App() {
 
       <div className="grid" onMouseLeave={handleMouseLeaveGrid}>
         {
-          cells.map((row, rowId) => {
-            return (
-              <div className="row" key={rowId * 100}>
-                {row.map((cell, cellId) => <CellDisplay key={cell.key} cell={cell} handleClickOnCell={handleClickOnCell} handleMouseOver={handleMouseOver} />)}
-              </div>
+          cells.map(row => 
+            row.map((cell, cellId) =>{
+              return(
+              <CellDisplay
+              key={cell.key}
+              cell={cell}
+              handleClickOnCell={handleClickOnCell}
+              handleMouseOver={handleMouseOver}
+            />
+
             )
-          })
+            } )
+          )
         }
       </div>
+      <br />
+      <br />
+      <br />
       <button onClick={() => { setCells(LoadGridValues(cells, GridValues.arrayA)) }}>Load default values</button>
       <button onClick={() => { setCells(ClearGridValues(cells)) }}>Clear all</button>
       <button onClick={() => { SolveBacktracking(false) }}>Solve</button>

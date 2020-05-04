@@ -1,80 +1,103 @@
 @keyframes solve {
-    0% {transform: scale(1.5); z-index: 10;}
-    100% { transform: scale(1); z-index: 1;}
-  }
+    0% {
+        transform: scale(0.3);
+        z-index: 0;
+        background-color: inherit;
+    }
+    50% {
+        transform: scale(1.2);
+        z-index: 2;
+    }
+    100% {
+        transform: scale(1);
+        z-index: 1;
+        background-color: lightgreen;
+    }
+}
 
-
-.App{
+.App {
     height: 100vh;
     width: 100vh;
     margin: 0;
-
-    
 }
 
-
-.grid{
-    display: inline;
+.cell-inner:nth-child(n):nth-child(-n + 9) {
+    border-top-width: 2px;
 }
-.row{
-    /* margin: auto; */
-    width: max-content;
-
+.cell-inner:nth-child(n + 73):nth-child(-n + 81) {
+    border-bottom-width: 2px;
+}
+.cell-inner:nth-child(3n) {
+    border-right-width: 2px;
+}
+.cell-inner:nth-child(9n + 1) {
+    border-left-width: 2px;
+}
+.cell-inner:nth-child(n + 19):nth-child(-n + 27) {
+    border-bottom-width: 2px;
+}
+.cell-inner:nth-child(n + 46):nth-child(-n + 54) {
+    border-bottom-width: 2px;
 }
 
+.grid {
+    display: grid;
+    grid-template-columns: repeat(9, 5vw);
+    grid-template-rows: repeat(9, 5vw);
+    justify-content: center;
+    align-content: center;
+    grid-gap: 0rem;
+}
 
-.cell{
-    position: relative;
+.cell-inner {
+    margin: 0;
+    padding: 0;
 
-    width: 50px;
-    height: 50px;
-    background-color: coral;
-    border: 1px solid #000;
-    text-align: center;
-    vertical-align: middle;
-    display: table-cell;
+    border: 1px solid black;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* background-color: coral; */
+
     cursor: pointer;
-    z-index: 1;
-    transform: scale(1);
-    transition: all 0.05s ease-out;
+
 }
 
-.clicked{
-    background-color: rgb(255, 90, 30);
+.clicked {
+    /* background-color: rgb(255, 90, 30); */
 
-    transform: scale(1.2);
+    /* transform: scale(1.2); */
     z-index: 10;
     /* background-color: cornflowerblue; */
-
 }
 
-
-.cell-number{
+.cell-number {
     font-size: 1.2em;
     font-weight: 500;
 
     transform: scale(1);
-    transition: all 0.2s ease-out;
-
+    /* transition: all 0.2s ease-out; */
 }
 
-
-.isGiven{
+.isGiven {
     font-size: 1.3em;
     font-weight: bolder;
     cursor: text;
 }
+
 .isSolved {
-    animation: 0.1s linear 0s solve;
-    background-color: lightgreen;
+    animation: 0.4s linear 0s solve;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease-out;
+    color: #666;
 }
 
-
-.notGiven{
+.notGiven {
     font-size: 1.3em;
     color: #777;
 }
 
-.highlighted{
-    background-color: rgb(155, 41, 0);
+.highlighted {
+    /* background-color: rgb(155, 41, 0); */
 }

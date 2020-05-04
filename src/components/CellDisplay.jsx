@@ -10,8 +10,9 @@ function Cell({ cell, handleClickOnCell,handleMouseOver }) {
 
   const displayCellValue = () => {
     if (cell.isGiven){
-      const cellClass = "cell isGiven " + (cell.highlighted ? " highlighted" : "");
+      const cellClass = "cell-inner isGiven " + (cell.highlighted ? " highlighted" : "");
       return (
+
         <div 
         className={cellClass}
         onMouseOver={() => {handleMouseOver(cell)}}
@@ -22,8 +23,9 @@ function Cell({ cell, handleClickOnCell,handleMouseOver }) {
     }
 
     else if(cell.actualValue > 0){
-      const cellClass = "cell isSolved " + (cell.highlighted ? " highlighted" : "");
+      const cellClass = "cell-inner isSolved " + (cell.highlighted ? " highlighted" : "");
       return (
+
         <div 
           className={cellClass}
           onMouseOver={() => {handleMouseOver(cell)}}
@@ -34,8 +36,9 @@ function Cell({ cell, handleClickOnCell,handleMouseOver }) {
     }
 
     else {
-      const cellClass = "cell notGiven " + (clickedOn ? " clicked" : "") + (cell.highlighted ? " highlighted" : "");
+      const cellClass = "cell-inner notGiven " + (clickedOn ? " clicked" : "") + (cell.highlighted ? " highlighted" : "");
       return (
+
         <div
           className={cellClass}
           onMouseOver={() => {handleMouseOver(cell)}}
