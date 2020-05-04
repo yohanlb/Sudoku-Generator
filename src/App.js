@@ -1,25 +1,22 @@
 import React, { useEffect, useState, useRef } from 'react';
 import CellDisplay from './components/CellDisplay';
-import Cell from './components/Cell';
-import * as GridFunc from './grid-helper-functions.js';
-import * as GridValues from './gridValues.js';
+import Cell from './scripts/Cell';
+import * as GridFunc from './scripts/gridFunctions.js';
+import * as GridValues from './scripts/gridValues.js';
+import * as Solver from './scripts/solver.js';
+import SidePanel from './components/SidePanel';
+
 
 import './styles/App.scss';
-import PossibleValues from './components/PossibleValues';
-import SidePanel from './components/SidePanel';
 
 let history = [];
 
 function App() {
 
-  const numRow = 9;
-  const numCol = 9;
-
-
 
   const [cells, setCells] = useState([]);
-  const [possibleValues, setPossibleValues] = useState([]);
   const [solverResult, setSolverResult] = useState("");
+  const [cellInfo, setCellInfo] = useState({});
   //const [history, setHistory ] = useState([]);
 
  
@@ -31,21 +28,18 @@ function App() {
   
   const Tick = () => {
 
-
+    console.log(history.length);
     // PLAY HISTORY
     if(history.length > 0){
-      const newCells = JSON.parse(JSON.stringify(cells));
+      const newCells = [...cells];
 
-      const [x, y] = GridFunc.KeyToCoord(history[0].key);
-      newCells[y][x].actualValue = history[0].actualValue ;
-      UpdateCells(newCells)
-      history.shift()
+      newCells[history[0].key].setSolvedValue(history[0].actualValue);
+      setCells(newCells);
+      history.shift();
 
     } 
 
   }
-
-  
 
    
   const addToHistory = (_newStep) =>{
@@ -55,51 +49,37 @@ function App() {
   useEffect(() => {
 
     let tempCells = [];
-    let key = 0;
-    for (let row = 0; row < numRow; row++) {
-      const currentRow = [];
-      for (let col = 0; col < numCol; col++) {
-        currentRow.push(new Cell(key, col, row));
-        key++;
-      }
-      tempCells.push(currentRow);
+    for (let i = 0; i < 9*9; i++) {
+        tempCells.push(new Cell(i));
     }
 
     console.log(tempCells);
-    tempCells = LoadGridValues(tempCells, GridValues.arrayA)
+    //tempCells = LoadGridValues(tempCells, GridValues.arrayA)
     setCells(tempCells);
 
 
   }, [])
 
-
   const ClearGridValues = (_cells) => {
-    let newCells = JSON.parse(JSON.stringify(_cells));
+    let newCells = [ ..._cells];
     history = []; //clear history
-    newCells.forEach((row) => {
-      row.forEach((cell) => {
-        cell.actualValue = 0;
-        cell.guessedValue = 0;
-        cell.isGiven = false;
-      });
+    newCells.forEach(cell => {
+       cell.clearCell();
     });
+
     return newCells;
 
   }
 
-
-
   const LoadGridValues = (_cells, values) => {
-    let newCells = JSON.parse(JSON.stringify(_cells));
+    let newCells = [..._cells];
+    
     history = []; //clear history
     newCells = ClearGridValues(newCells);
-    newCells.forEach((row) => {
-      row.forEach((cell) => {
-        if (values[cell.key] !== 0) {
-          cell.actualValue = values[cell.key];
-          cell.isGiven = true;
-        }
-      });
+    newCells.forEach(cell => {
+      if (values[cell.key] !== 0) {
+        cell.setGivenValue(values[cell.key]);
+      }
     });
     return newCells
   }
@@ -114,19 +94,10 @@ function App() {
     setCells(_cells);
 
   }
-
-  
-  const Solve = () =>{
-    const solverResult = GridFunc.solver(cells)
-    
-    setCells(solverResult[0]);
-    setSolverResult(solverResult[1]);
-  }
   
 
-  const SolveBacktracking = (stepByStep = false) => {
-    const newCells = JSON.parse(JSON.stringify(cells));
-    const solverResult = GridFunc.sovlerWithBackTracking(newCells, addToHistory, stepByStep)
+  const handleClickOnSolve = (stepByStep = false) => {
+    const solverResult = Solver.solveGrid([ ...cells], addToHistory, stepByStep)
 
     if(!stepByStep){
       setCells(solverResult[0]);
@@ -135,51 +106,50 @@ function App() {
   }
 
   const handleMouseLeaveGrid = () => {
-    setPossibleValues([]);
+    setCellInfo({});
   }
 
-  const handleMouseOver = (_cell) =>{
-    const newCells = JSON.parse(JSON.stringify(cells));
+  const handleMouseOver = (_cellKey) =>{
+    cells[_cellKey].setPossibleValues(Solver.getPossibleValuesForCell(cells, cells[_cellKey]));
+    setCellInfo(cells[_cellKey].getCellInfo());
 
-    const possibleVal = GridFunc.getPossibleValuesForCell(newCells, _cell);
-    setPossibleValues(possibleVal);
+    //const newCells = JSON.parse(JSON.stringify(cells));
 
+    //setCellInfo(_cell.getCellInfo())
+
+    //const possibleVal = Solver.getPossibleValuesForCell(newCells, _cell);
+    //setPossibleValues(possibleVal);
+/*
     newCells.forEach((row) => {
       row.forEach((cell) => {
         cell.highlighted= false;
       });
     });
-    GridFunc.returnSquareCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
-    GridFunc.returnEntireColCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
-    GridFunc.returnEntireRowCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
+    */
+    //GridFunc.returnSquareCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
+    //GridFunc.returnEntireColCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
+    //GridFunc.returnEntireRowCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
     
-    setCells(newCells);
+   // setCells(newCells);
     
   }
 
-  // row.find( cell => cell.key === _key)
   const handleClickOnCell = (event, _key, isRightClick = false) => {
     event.preventDefault();
-    const newCells = JSON.parse(JSON.stringify(cells));
+    const newCells = [...cells];
 
-    let clickedCell = null;
-    newCells.forEach(row => {
-      const search = row.find(cell => cell.key === _key);
-      if (search) clickedCell = search;
-    });
+    let clickedCell = newCells[_key];
 
     if (clickedCell != null) {
-      //console.log(clickedCell);
       //calc new cell value
       let newCellValue = clickedCell.guessedValue + (isRightClick ? -1 : 1);
       newCellValue < 0 && (newCellValue = 9);
       newCellValue > 9 && (newCellValue = 0);
 
       //assign the new cell value and update de main array;
-      clickedCell.guessedValue = newCellValue;
+      clickedCell.setGuessedValue(newCellValue);
       setCells(newCells);
 
-      //GridFunc.returnEntireRowKeys(clickedCell);
   
     }
 
@@ -196,25 +166,23 @@ function App() {
       <div className="grid-container">
           <div className="grid" onMouseLeave={handleMouseLeaveGrid}>
             {
-              cells.map(row => 
-                row.map((cell, cellId) =>{
-                  return(
+              cells.map(cell => {
+                return (
                   <CellDisplay
-                  key={cell.key}
-                  cell={cell}
-                  handleClickOnCell={handleClickOnCell}
-                  handleMouseOver={handleMouseOver}
-                />
-
+                    key={cell.key}
+                    cell={cell}
+                    handleClickOnCell={handleClickOnCell}
+                    handleMouseOver={handleMouseOver}
+                  />
                 )
-                } )
-              )
+              })
             }
           </div>
       </div>
      
       <SidePanel 
-        SolveBacktracking={SolveBacktracking}
+        cellInfo={cellInfo}
+        handleClickOnSolve={handleClickOnSolve}
         handleClickOnClearAll={handleClickOnClearAll}
         handleClickOnLoadValues={handleClickOnLoadValues}
         solverResult={solverResult}
@@ -232,16 +200,14 @@ export default App;
 
 
 
-
+// Allow to use interval with hooks
 function useInterval(callback, delay) {
   const savedCallback = useRef();
 
-  // Se souvenir de la dernière fonction de rappel.
   useEffect(() => {
     savedCallback.current = callback;
   });
 
-  // Configurer l’intervalle.
   useEffect(() => {
     function tick() {
       savedCallback.current();

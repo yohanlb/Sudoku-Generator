@@ -62,6 +62,8 @@ body, #root {
     justify-content: center;
     align-content: center;
     grid-gap: 0rem;
+    width: min-content;
+    margin: auto;
 }
 
 .cell-inner {

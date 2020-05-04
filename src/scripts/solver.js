@@ -1,94 +1,5 @@
-/**
-* Return the keys of all the other cells in the Col.
-* @param {object} cell an object of type "cell".
-* @returns {Array} Array of cells keys.
-*/
-export const returnEntireColKeys = (cell) => {
-
-    const res = []
-    for (let i = 0; i < 9; i++) {
-        //console.log(cell.y + cell.x * i);
-        res.push(cell.x + 9 * i);
-    }
-    return res;
-}
-
-
-/**
-* Return all the cells in the same row
-* @param {Array} cells array of cells.
-* @param {object} cell object of type cell.
-* @returns {Array} Array of cells object.
-*/
-export const returnEntireRowCells = (cells, cell) => {
-    return cells[cell.y];
-}
-
-
-/**
-* Return all the cells in the same col
-* @param {Array} cells array of cells.
-* @param {object} cell object of type cell.
-* @returns {Array} Array of cells object.
-*/
-export const returnEntireColCells = (cells, cell) => {
-    const res = [];
-    cells.forEach(
-        (row) => { res.push(row[cell.x]) }
-    )
-    return res;
-
-}
-
-export const coordToKey = (x ,y) => {
-    return ( 9*y + x);
-}
-export const KeyToCoord = (key) => {
-    return ([key%9,Math.floor(key/9)] );
-}
-
-
-
-export const returnSquareKeys = (cell) => {
-    const dx = Math.floor(cell.x / 3);
-    const dy = Math.floor(cell.y / 3);
-
-    const squareCoords = [
-        [dx * 3 + 0, dy * 3 + 0], [dx * 3 + 1, dy * 3 + 0], [dx * 3 + 2, dy * 3 + 0],
-        [dx * 3 + 0, dy * 3 + 1], [dx * 3 + 1, dy * 3 + 1], [dx * 3 + 2, dy * 3 + 1],
-        [dx * 3 + 0, dy * 3 + 2], [dx * 3 + 1, dy * 3 + 2], [dx * 3 + 2, dy * 3 + 2]
-    ]
-
-    const squareKeys = []
-    
-    squareCoords.forEach((cellCoords) => {
-        squareKeys.push(coordToKey(cellCoords[0], cellCoords[1]));
-    }) 
-
-    return (squareKeys);
-}
-
-
-
-export const getSeveralCellByKey = (cells, keys) => {
-    const res = [] 
-    cells.forEach((row)=>{
-        row.forEach((cell) =>{
-            const isSearched = keys.some((key)=>key ===  cell.key)
-            if (isSearched) {res.push(cell);}
-            
-        })
-    })
-    
-    return res;
-}
-
-export const returnSquareCells = (cells, cell) => {
-    const keys = returnSquareKeys(cell);
-    return getSeveralCellByKey (cells, keys) ;
-}
-
-
+import * as GridFunc from './gridFunctions.js';
+import Cell from './Cell';
 
 
 export const getPossibleValuesForCell = (cells, cell, considerGuessedValues = true) => {
@@ -96,9 +7,9 @@ export const getPossibleValuesForCell = (cells, cell, considerGuessedValues = tr
     
     //get all the cells in range of the selected one
     let cellsInRange = []
-    cellsInRange = cellsInRange.concat(returnSquareCells(cells, cell));
-    cellsInRange = cellsInRange.concat(returnEntireRowCells(cells, cell));
-    cellsInRange = cellsInRange.concat(returnEntireColCells(cells, cell));
+    cellsInRange = cellsInRange.concat(GridFunc.returnSquareCells(cells, cell));
+    cellsInRange = cellsInRange.concat(GridFunc.returnEntireRowCells(cells, cell));
+    cellsInRange = cellsInRange.concat(GridFunc.returnEntireColCells(cells, cell));
 
     //filter out the selected cell
     cellsInRange = cellsInRange.filter((item)=>item.key !== cell.key);
@@ -188,7 +99,7 @@ export const getNextCellToSolve = (_cells, _cell) => {
     const maxLoop = 9*9;
     let i = 0;
     while(i < maxLoop){
-        const coords = KeyToCoord(keyToFind);
+        const coords = GridFunc.KeyToCoord(keyToFind);
         console.log("coords : "+ coords);
         const cellToCheck = _cells[coords[1]][coords[0]];
         
@@ -204,41 +115,8 @@ export const getNextCellToSolve = (_cells, _cell) => {
 
 
 
-
-export const recursiveValidation = (_cells, key) => {
-    const tempCells = [ ..._cells];
-
-    const useGuessedValues = true;
-    //console.log("key : ", key);
-    if (key >= 9 * 9) { return true }  //Solving finished
-
-    const coords = KeyToCoord(key);
-    const currentCell = tempCells[coords[1]][coords[0]];
-    if (currentCell.actualValue > 0 || (useGuessedValues && currentCell.guessedValue > 0)) {
-        // this cell is already solved, go to next cell
-        return recursiveValidation(tempCells, key + 1);
-    }
-
-    const pValues = getPossibleValuesForCell(tempCells, currentCell);
-    for (let v = 1; v <= 9; v++) {
-        //console.log("key : ", currentCell.key, "v :  ", v, "pValues : ", pValues);
-        if (pValues.some(e=> e === v)){
-            currentCell.actualValue = v;
-            // try to resolve the rest of the array with this value for the current cell
-            if ( recursiveValidation (tempCells, key+1) )
-                return true; 
-        }
-
-    }
-
-    currentCell.actualValue = 0 ; // no value possible for this cell, reset it to 0.
-    return false // this grill is not solvable, going back to previous recursion.
-}
-
-
-
-export const sovlerWithBackTracking = (_cells, addToHistory, stepByStep = false) =>{
-    const newCells = JSON.parse(JSON.stringify(_cells));
+export const solveGrid = (_cells, addToHistory = null, stepByStep = false) =>{
+    const newCells = [ ..._cells];
     
     let res;
     if(stepByStep){
@@ -249,19 +127,50 @@ export const sovlerWithBackTracking = (_cells, addToHistory, stepByStep = false)
 
     }
     //UpdateCells(newCells);
-    const resString = res ? "Solved with success" : "Error"
+    const resString = res ? "Success" : "Error"
     return [newCells, resString];
 }
 
 
+
+export const recursiveValidation = (_cells, key) => {
+    const tempCells = [ ..._cells];
+    const useGuessedValues = true;
+    //console.log("key : ", key);
+    if (key >= 9 * 9) { return true }  //Solving finished
+
+    const currentCell = tempCells[key];
+    if (currentCell.actualValue > 0 || (useGuessedValues && currentCell.guessedValue > 0)) {
+        // this cell is already solved, go to next cell
+        return recursiveValidation(tempCells, key + 1);
+    }
+
+    const pValues = getPossibleValuesForCell(tempCells, currentCell);
+    for (let v = 1; v <= 9; v++) {
+        //console.log("key : ", currentCell.key, "v :  ", v, "pValues : ", pValues);
+        if (pValues.some(e=> e === v)){
+            currentCell.setSolvedValue(v);
+            // try to resolve the rest of the array with this value for the current cell
+            if ( recursiveValidation (tempCells, key+1) )
+                return true; 
+        }
+
+    }
+
+    currentCell.setSolvedValue(0); // no value possible for this cell, reset it to 0.
+    return false // this grill is not solvable, going back to previous recursion.
+}
+
+
+
 export const recursiveValidationStepByStep = (_cells, key, addToHistory) => {
+    const tempCells = [ ..._cells];
 
     const useGuessedValues = true;
     //console.log("key : ", key);
     if (key >= 9 * 9) { return true }  //Solving finished
 
-    const coords = KeyToCoord(key);
-    const currentCell = _cells[coords[1]][coords[0]];
+    const currentCell = tempCells[key];
     if (currentCell.actualValue > 0 || (useGuessedValues && currentCell.guessedValue > 0)) {
         // this cell is already solved, go to next cell
         return recursiveValidationStepByStep(_cells, key + 1, addToHistory);
@@ -273,8 +182,7 @@ export const recursiveValidationStepByStep = (_cells, key, addToHistory) => {
     for (let v = 1; v <= 9; v++) {
         //console.log("key : ", currentCell.key, "v :  ", v, "pValues : ", pValues);
         if (pValues.some(e=> e === v)){
-            currentCell.actualValue = v;
-            
+            currentCell.setSolvedValue(v)
             addToHistory( {
                 key:currentCell.key,
                 actualValue:v
@@ -287,7 +195,7 @@ export const recursiveValidationStepByStep = (_cells, key, addToHistory) => {
 
     }
 
-    currentCell.actualValue = 0 ; // no value possible for this cell, reset it to 0.
+    currentCell.setSolvedValue(0) // no value possible for this cell, reset it to 0.
     addToHistory( {
         key:currentCell.key,
         actualValue:0
@@ -296,11 +204,3 @@ export const recursiveValidationStepByStep = (_cells, key, addToHistory) => {
     return false // this grill is not solvable, going back to previous recursion.
 }
 
-
-export const sleep = (ms) => {
-    const date = Date.now();
-    let currentDate = null;
-    do {
-      currentDate = Date.now();
-    } while (currentDate - date < ms);
-  }

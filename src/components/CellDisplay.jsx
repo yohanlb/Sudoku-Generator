@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-function Cell({ cell, handleClickOnCell,handleMouseOver }) {
+function CellDisplay({ cell, handleClickOnCell,handleMouseOver }) {
   const [clickedOn, setClickedOn] = useState(false);
 
   const handleClick = (e, isRightClick = false) => {
@@ -15,7 +15,7 @@ function Cell({ cell, handleClickOnCell,handleMouseOver }) {
 
         <div 
         className={cellClass}
-        onMouseOver={() => {handleMouseOver(cell)}}
+        onMouseOver={() => {handleMouseOver(cell.key)}}
         >
           <span className="cell-number">{cell.actualValue}</span>
         </div>
@@ -28,7 +28,7 @@ function Cell({ cell, handleClickOnCell,handleMouseOver }) {
 
         <div 
           className={cellClass}
-          onMouseOver={() => {handleMouseOver(cell)}}
+          onMouseOver={() => {handleMouseOver(cell.key)}}
         >
           <span className="cell-number">{cell.actualValue}</span>
         </div>
@@ -41,7 +41,7 @@ function Cell({ cell, handleClickOnCell,handleMouseOver }) {
 
         <div
           className={cellClass}
-          onMouseOver={() => {handleMouseOver(cell)}}
+          onMouseOver={() => {handleMouseOver(cell.key)}}
           onTransitionEnd={() => {setClickedOn(false)}}
           onClick={(e) => {
             handleClick(e);
@@ -61,4 +61,4 @@ function Cell({ cell, handleClickOnCell,handleMouseOver }) {
   return displayCellValue();
 }
 
-export default Cell;
+export default CellDisplay;
