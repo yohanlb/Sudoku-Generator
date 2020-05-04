@@ -288,6 +288,11 @@ export const recursiveValidationStepByStep = (_cells, key, addToHistory) => {
     }
 
     currentCell.actualValue = 0 ; // no value possible for this cell, reset it to 0.
+    addToHistory( {
+        key:currentCell.key,
+        actualValue:0
+    } )
+
     return false // this grill is not solvable, going back to previous recursion.
 }
 

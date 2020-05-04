@@ -4,9 +4,9 @@ import Cell from './components/Cell';
 import * as GridFunc from './grid-helper-functions.js';
 import * as GridValues from './gridValues.js';
 
-import './App.css';
+import './styles/App.scss';
 import PossibleValues from './components/PossibleValues';
-import SolverResult from './components/SolverResult';
+import SidePanel from './components/SidePanel';
 
 let history = [];
 
@@ -26,7 +26,7 @@ function App() {
 
   useInterval(() => {
     Tick()
-  }, 50);
+  }, 20);
 
   
   const Tick = () => {
@@ -87,6 +87,8 @@ function App() {
 
   }
 
+
+
   const LoadGridValues = (_cells, values) => {
     let newCells = JSON.parse(JSON.stringify(_cells));
     history = []; //clear history
@@ -100,6 +102,12 @@ function App() {
       });
     });
     return newCells
+  }
+  const handleClickOnClearAll = () =>{
+    setCells(ClearGridValues(cells));
+  }
+  const handleClickOnLoadValues = () =>{
+    setCells(LoadGridValues(cells, GridValues.arrayA));
   }
 
   const UpdateCells = (_cells) =>{
@@ -185,33 +193,34 @@ function App() {
 
   return (
     <div className="App">
+      <div className="grid-container">
+          <div className="grid" onMouseLeave={handleMouseLeaveGrid}>
+            {
+              cells.map(row => 
+                row.map((cell, cellId) =>{
+                  return(
+                  <CellDisplay
+                  key={cell.key}
+                  cell={cell}
+                  handleClickOnCell={handleClickOnCell}
+                  handleMouseOver={handleMouseOver}
+                />
 
-      <div className="grid" onMouseLeave={handleMouseLeaveGrid}>
-        {
-          cells.map(row => 
-            row.map((cell, cellId) =>{
-              return(
-              <CellDisplay
-              key={cell.key}
-              cell={cell}
-              handleClickOnCell={handleClickOnCell}
-              handleMouseOver={handleMouseOver}
-            />
-
-            )
-            } )
-          )
-        }
+                )
+                } )
+              )
+            }
+          </div>
       </div>
-      <br />
-      <br />
-      <br />
-      <button onClick={() => { setCells(LoadGridValues(cells, GridValues.arrayA)) }}>Load default values</button>
-      <button onClick={() => { setCells(ClearGridValues(cells)) }}>Clear all</button>
-      <button onClick={() => { SolveBacktracking(false) }}>Solve</button>
-      <button onClick={() => { SolveBacktracking(true) }}>Solve (step by step)</button>
-      <PossibleValues possibleValues={possibleValues}/>
-      <SolverResult solverResult={solverResult} />
+     
+      <SidePanel 
+        SolveBacktracking={SolveBacktracking}
+        handleClickOnClearAll={handleClickOnClearAll}
+        handleClickOnLoadValues={handleClickOnLoadValues}
+        solverResult={solverResult}
+      />
+   
+      {/* <PossibleValues possibleValues={possibleValues}/> */}
 
     </div>
   );
