@@ -1,18 +1,49 @@
-export default class Cell{
-    constructor(key){
-        this.key = key;
-        this.x = key%9;
-        this.y = Math.floor(key/9);
+export default function Cell(key){
+    
+    this.key = key;
+    this.x = key%9;
+    this.y = Math.floor(key/9);
+    this.guessedValue = 0;
+    this.actualValue = 0;
+    this.isGiven = false;
+    this.highlighted = false;
+    this.possibleValues = [];
+
+
+
+    this.printCellInfo = function(){
+        console.table(this);
+    };
+
+    this.setPossibleValues = function(array){
+        this.possibleValues = array;
+    };
+
+    this.clearCell = function(){
         this.guessedValue = 0;
         this.actualValue = 0;
         this.isGiven = false;
         this.highlighted = false;
         this.possibleValues = [];
-    }
+    };
+
+    this.setGivenValue = function(val){
+        this.actualValue = val;
+        this.isGiven = true;
+    };
+
+    this.setGuessedValue = function (val) {
+        this.guessedValue = val;
+    };
+
+    this.setSolvedValue =  function (val) {
+        this.actualValue = val;
+    };
 
 
 
-    getCellInfo = () =>{
+    
+    this.getCellInfo = function(){
         return{
             key:this.key,
             x:this.x,
@@ -23,38 +54,6 @@ export default class Cell{
             highlighted:this.highlighted,
             possibleValues:this.possibleValues,
         }
-    }
-
-
-
-
-    printCellInfo = () =>{
-        console.table(this);
-    }
-
-    setPossibleValues(array){
-        this.possibleValues = array;
-    }
-
-    clearCell(){
-        this.guessedValue = 0;
-        this.actualValue = 0;
-        this.isGiven = false;
-        this.highlighted = false;
-        this.possibleValues = [];
-    }
-
-    setGivenValue(val){
-        this.actualValue = val;
-        this.isGiven = true;
-    }
-
-    setGuessedValue(val){
-        this.guessedValue = val;
-    }
-
-    setSolvedValue(val){
-        this.actualValue = val;
-    }
+    };
 
 }

@@ -116,8 +116,7 @@ export const getNextCellToSolve = (_cells, _cell) => {
 
 
 export const solveGrid = (_cells, addToHistory = null, stepByStep = false) =>{
-    const newCells = [ ..._cells];
-    
+    let newCells = GridFunc.cloneGrid(_cells);
     let res;
     if(stepByStep){
         res = recursiveValidationStepByStep(newCells, 0, addToHistory);

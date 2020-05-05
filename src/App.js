@@ -6,13 +6,11 @@ import * as GridValues from './scripts/gridValues.js';
 import * as Solver from './scripts/solver.js';
 import SidePanel from './components/SidePanel';
 
-
 import './styles/App.scss';
 
 let history = [];
 
 function App() {
-
 
   const [cells, setCells] = useState([]);
   const [solverResult, setSolverResult] = useState("");
@@ -28,7 +26,6 @@ function App() {
   
   const Tick = () => {
 
-    console.log(history.length);
     // PLAY HISTORY
     if(history.length > 0){
       const newCells = [...cells];
@@ -41,6 +38,7 @@ function App() {
 
   }
 
+ 
    
   const addToHistory = (_newStep) =>{
     history = history.concat(_newStep);
@@ -58,10 +56,12 @@ function App() {
     setCells(tempCells);
 
 
+   
   }, [])
 
   const ClearGridValues = (_cells) => {
-    let newCells = [ ..._cells];
+    let newCells = GridFunc.cloneGrid(_cells);
+    
     history = []; //clear history
     newCells.forEach(cell => {
        cell.clearCell();
@@ -72,7 +72,7 @@ function App() {
   }
 
   const LoadGridValues = (_cells, values) => {
-    let newCells = [..._cells];
+    let newCells = GridFunc.cloneGrid(_cells);
     
     history = []; //clear history
     newCells = ClearGridValues(newCells);
@@ -90,11 +90,6 @@ function App() {
     setCells(LoadGridValues(cells, GridValues.arrayA));
   }
 
-  const UpdateCells = (_cells) =>{
-    setCells(_cells);
-
-  }
-  
 
   const handleClickOnSolve = (stepByStep = false) => {
     const solverResult = Solver.solveGrid([ ...cells], addToHistory, stepByStep)
@@ -136,7 +131,7 @@ function App() {
 
   const handleClickOnCell = (event, _key, isRightClick = false) => {
     event.preventDefault();
-    const newCells = [...cells];
+    let newCells = GridFunc.cloneGrid(cells);
 
     let clickedCell = newCells[_key];
 

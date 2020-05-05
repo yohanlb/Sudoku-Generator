@@ -14,6 +14,10 @@ export const returnEntireColKeys = (cell) => {
 }
 */
 
+export const cloneGrid = (_cells) => {
+    return _cells.map(object => ({ ...object }))
+}
+
 export const returnEntireRowCells = (cells, cell) => {
     const row  = cell.y;
     const entireRow = [];
