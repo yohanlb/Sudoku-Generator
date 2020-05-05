@@ -118,30 +118,30 @@ function App() {
 
   const handleMouseLeaveGrid = () => {
     setCellInfo({});
+    const newCells = GridFunc.cloneGrid(cells);
+    newCells.forEach(cell=> {
+      cell.setHovered(false);
+    })
+    setCells(newCells);
   }
 
   const handleMouseOver = (_cellKey) =>{
-    cells[_cellKey].setPossibleValues(Solver.getPossibleValuesForCell(cells, cells[_cellKey]));
-    setCellInfo(cells[_cellKey].getCellInfo());
+    let newCells = GridFunc.cloneGrid(cells);
+    newCells[_cellKey].setPossibleValues(Solver.getPossibleValuesForCell(newCells, newCells[_cellKey]));
+    setCellInfo(newCells[_cellKey].getCellInfo());
 
-    //const newCells = JSON.parse(JSON.stringify(cells));
 
-    //setCellInfo(_cell.getCellInfo())
+    let keysToHighlight = [];
+    keysToHighlight = keysToHighlight.concat(GridFunc.returnSquareKeys(newCells[_cellKey]));
+    keysToHighlight = keysToHighlight.concat(GridFunc.returnEntireColKeys(newCells, _cellKey));
+    keysToHighlight = keysToHighlight.concat(GridFunc.returnEntireRowKeys(newCells, _cellKey));
 
-    //const possibleVal = Solver.getPossibleValuesForCell(newCells, _cell);
-    //setPossibleValues(possibleVal);
-/*
-    newCells.forEach((row) => {
-      row.forEach((cell) => {
-        cell.highlighted= false;
-      });
+    newCells.forEach((cell) => {
+        const highlight = (keysToHighlight.indexOf(cell.key) === -1 ) ? false : true;
+        cell.setHovered(highlight);
     });
-    */
-    //GridFunc.returnSquareCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
-    //GridFunc.returnEntireColCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
-    //GridFunc.returnEntireRowCells(newCells, _cell).forEach((cell)=>{cell.highlighted = true});
     
-   // setCells(newCells);
+   setCells(newCells);
     
   }
 

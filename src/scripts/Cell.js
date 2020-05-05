@@ -42,6 +42,10 @@ export default function Cell(key){
         this.solvedValue = val;
     };
 
+    this.setHovered = function (hovered){
+        this.highlighted = hovered;
+    }
+
 
 
     

@@ -30,6 +30,18 @@ export const returnEntireRowCells = (cells, cell) => {
     return entireRow;
 }
 
+export const returnEntireRowKeys = (_cells, _key) => {
+    const row  = _cells[_key].y;
+    const entireRow = [];
+
+    for(let i = 0 ; i < 9*9; i++){
+        if (Math.floor(i/9) === row){
+            entireRow.push(i);
+        }
+    }
+    return entireRow;
+}
+
 
 export const returnEntireColCells = (cells, cell) => {
     const entireCol = [];
@@ -38,6 +50,18 @@ export const returnEntireColCells = (cells, cell) => {
     for (let i = 0 ; i < 9*9 ; i++){
         if(i%9 === col){
             entireCol.push(cells[i]);
+        }
+    }
+    return entireCol;
+}
+
+export const returnEntireColKeys = (_cells, _key) => {
+    const entireCol = [];
+    const col = _cells[_key].x;
+
+    for (let i = 0 ; i < 9*9 ; i++){
+        if(i%9 === col){
+            entireCol.push(i);
         }
     }
     return entireCol;
