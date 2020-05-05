@@ -15,7 +15,7 @@ function App() {
   const [cells, setCells] = useState([]);
   const [solverResult, setSolverResult] = useState("");
   const [cellInfo, setCellInfo] = useState({});
-  //const [history, setHistory ] = useState([]);
+
 
  
 
@@ -30,7 +30,7 @@ function App() {
     if(history.length > 0){
       const newCells = [...cells];
 
-      newCells[history[0].key].setSolvedValue(history[0].actualValue);
+      newCells[history[0].key].setSolvedValue(history[0].solvedValue);
       setCells(newCells);
       history.shift();
 
@@ -98,6 +98,15 @@ function App() {
       setCells(solverResult[0]);
     }
     setSolverResult(solverResult[1]);
+  }
+
+  const handleClickOnGenerate = (stepByStep, difficulty) => {
+    let generatedGrid = GridFunc.cloneGrid(cells);
+    generatedGrid = ClearGridValues(generatedGrid);
+    Solver.generateAGrid(cells, addToHistory, true, difficulty);
+    if(generatedGrid && !stepByStep) setCells(generatedGrid);
+
+
   }
 
   const handleMouseLeaveGrid = () => {
@@ -178,6 +187,7 @@ function App() {
       <SidePanel 
         cellInfo={cellInfo}
         handleClickOnSolve={handleClickOnSolve}
+        handleClickOnGenerate={handleClickOnGenerate}
         handleClickOnClearAll={handleClickOnClearAll}
         handleClickOnLoadValues={handleClickOnLoadValues}
         solverResult={solverResult}

@@ -1,5 +1,4 @@
 import * as GridFunc from './gridFunctions.js';
-import Cell from './Cell';
 
 
 export const getPossibleValuesForCell = (cells, cell, considerGuessedValues = true) => {
@@ -17,6 +16,7 @@ export const getPossibleValuesForCell = (cells, cell, considerGuessedValues = tr
     //find which values are already used among all the cells in range
     cellsInRange.forEach((el)=>{
         if(el.actualValue > 0) valuesAvailability[el.actualValue-1] = 0; 
+        else if(el.solvedValue > 0) valuesAvailability[el.solvedValue-1] = 0; 
         else if(considerGuessedValues && el.guessedValue > 0) valuesAvailability[el.guessedValue-1] = 0;
     })
 
@@ -170,7 +170,10 @@ export const recursiveValidationStepByStep = (_cells, key, addToHistory) => {
     if (key >= 9 * 9) { return true }  //Solving finished
 
     const currentCell = tempCells[key];
-    if (currentCell.actualValue > 0 || (useGuessedValues && currentCell.guessedValue > 0)) {
+    const cellValue = currentCell.solvedValue > 0 
+        || currentCell.actualValue > 0 
+        || (useGuessedValues && currentCell.guessedValue > 0)
+    if (cellValue) {
         // this cell is already solved, go to next cell
         return recursiveValidationStepByStep(_cells, key + 1, addToHistory);
     }
@@ -184,11 +187,66 @@ export const recursiveValidationStepByStep = (_cells, key, addToHistory) => {
             currentCell.setSolvedValue(v)
             addToHistory( {
                 key:currentCell.key,
-                actualValue:v
+                solvedValue:v
             } )
 
             // try to resolve the rest of the array with this value for the current cell
             if ( recursiveValidationStepByStep (_cells, key+1, addToHistory) )
+                return true; 
+        }
+
+    }
+
+    currentCell.setSolvedValue(0) // no value possible for this cell, reset it to 0.
+    addToHistory( {
+        key:currentCell.key,
+        solvedValue:0
+    } )
+
+    return false // this grill is not solvable, going back to previous recursion.
+}
+
+
+export const generateAGrid = (_cells, addToHistory, stepByStep, nbOfCellToHide = 50) => {
+    let newCells = GridFunc.cloneGrid(_cells);
+
+    const cellsToHide = getRandomCellKeysToHide(nbOfCellToHide);
+    generatorStepByStep(newCells, 0, addToHistory, cellsToHide);
+
+    return newCells;
+}
+
+
+export const generatorStepByStep = (_cells, key, addToHistory, cellsToHide) => {
+    const tempCells = [ ..._cells];
+
+    const useGuessedValues = true;
+    //console.log("key : ", key);
+    if (key >= 9 * 9) { return true }  //Solving finished
+
+    const currentCell = tempCells[key];
+    if (currentCell.actualValue > 0 || (useGuessedValues && currentCell.guessedValue > 0)) {
+        // this cell is already solved, go to next cell
+        return generatorStepByStep(_cells, key + 1, addToHistory, cellsToHide);
+    }
+
+    if(cellsToHide.indexOf(key) !== -1){
+        return generatorStepByStep(_cells, key + 1, addToHistory, cellsToHide);
+    }
+
+
+    const pValues = getPossibleValuesForCell(_cells, currentCell);
+    let allValuesShuffled = shuffle([1,2,3,4,5,6,7,8,9]);
+    for (let v = 1; v <= 9; v++) {
+        if (pValues.some(e=> e === allValuesShuffled[v-1])){
+            currentCell.setSolvedValue(allValuesShuffled[v-1])
+            addToHistory( {
+                key:currentCell.key,
+                actualValue:allValuesShuffled[v-1]
+            } )
+
+            // try to resolve the rest of the array with this value for the current cell
+            if ( generatorStepByStep (_cells, key+1, addToHistory, cellsToHide) )
                 return true; 
         }
 
@@ -202,4 +260,27 @@ export const recursiveValidationStepByStep = (_cells, key, addToHistory) => {
 
     return false // this grill is not solvable, going back to previous recursion.
 }
+
+
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array
+    }
+
+    
+    
+    const getRandomCellKeysToHide = (nbOfCellToHide) => {
+        if(!nbOfCellToHide || nbOfCellToHide >= 9*9) {return}
+        const hide = [];
+        while(hide.length < nbOfCellToHide){
+            let r = Math.floor(Math.random() * 100) + 1;
+            if(hide.indexOf(r) === -1) hide.push(r);
+        }
+        return hide;
+    }
+
 

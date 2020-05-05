@@ -9,7 +9,7 @@ import '../styles/SidePanel.scss';
 
 
 
-function SidePanel({handleClickOnSolve, handleClickOnLoadValues, handleClickOnClearAll, solverResult, cellInfo}) {
+function SidePanel({handleClickOnSolve, handleClickOnGenerate, handleClickOnLoadValues, handleClickOnClearAll, solverResult, cellInfo}) {
     
     let DivCellInfo = "";
     if(Object.keys(cellInfo).length > 0){
@@ -31,6 +31,10 @@ function SidePanel({handleClickOnSolve, handleClickOnLoadValues, handleClickOnCl
                 <div className="button-container button-container-generate">
                     <h3 >Generator</h3>
                     <button onClick={handleClickOnLoadValues}>Load default values</button>
+                    <button onClick={() => { handleClickOnGenerate(true, 20) }}>Generate grid Easy</button>
+                    <button onClick={() => { handleClickOnGenerate(true, 35) }}>Generate grid Medium</button>
+                    <button onClick={() => { handleClickOnGenerate(true, 50) }}>Generate grid Hard</button>
+
                 </div>
 
                 <div className="button-container button-container-solver">

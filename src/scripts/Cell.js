@@ -5,6 +5,7 @@ export default function Cell(key){
     this.y = Math.floor(key/9);
     this.guessedValue = 0;
     this.actualValue = 0;
+    this.solvedValue = 0;
     this.isGiven = false;
     this.highlighted = false;
     this.possibleValues = [];
@@ -22,6 +23,7 @@ export default function Cell(key){
     this.clearCell = function(){
         this.guessedValue = 0;
         this.actualValue = 0;
+        this.solvedValue = 0;
         this.isGiven = false;
         this.highlighted = false;
         this.possibleValues = [];
@@ -37,7 +39,7 @@ export default function Cell(key){
     };
 
     this.setSolvedValue =  function (val) {
-        this.actualValue = val;
+        this.solvedValue = val;
     };
 
 

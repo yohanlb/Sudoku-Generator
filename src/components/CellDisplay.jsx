@@ -22,8 +22,21 @@ function CellDisplay({ cell, handleClickOnCell,handleMouseOver }) {
       );
     }
 
-    else if(cell.actualValue > 0){
+    else if(cell.solvedValue > 0){
       const cellClass = "cell-inner isSolved " + (cell.highlighted ? " highlighted" : "");
+      return (
+
+        <div 
+          className={cellClass}
+          onMouseOver={() => {handleMouseOver(cell.key)}}
+        >
+          <span className="cell-number">{cell.solvedValue}</span>
+        </div>
+      );
+    }
+
+    else if(cell.actualValue > 0){
+      const cellClass = "cell-inner isActual " + (cell.highlighted ? " highlighted" : "");
       return (
 
         <div 
