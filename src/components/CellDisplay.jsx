@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 function CellDisplay({ cell, handleClickOnCell,handleMouseOver }) {
   const [clickedOn, setClickedOn] = useState(false);

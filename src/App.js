@@ -101,8 +101,8 @@ function App() {
 
 
   const handleClickOnSolve = (stepByStep = false) => {
-    
-    const solverResult = Solver.solveGrid([ ...cells], addToHistory, stepByStep)
+      
+    const solverResult = Solver.solveGrid(GridFunc.cloneGrid(cells), addToHistory, stepByStep)
     if(!stepByStep){
       setCells(solverResult[0]);
     }
@@ -110,15 +110,9 @@ function App() {
   }
 
   const handleClickOnGenerate = (stepByStep, difficulty) => {
-    //handleClickOnClearAll();
-    clearGrid = true;
-    setTimeout(() => {
       let generatedGrid = GridFunc.cloneGrid(cells);
       generatedGrid = Solver.generateAGrid(generatedGrid, addToHistory, true, difficulty);
       if(generatedGrid && !stepByStep) setCells(generatedGrid);
-    },100);
-
-
 
   }
 
@@ -166,16 +160,9 @@ function App() {
       //assign the new cell value and update de main array;
       clickedCell.setGuessedValue(newCellValue);
       setCells(newCells);
-
   
     }
-
-
   }
-
-
-
-
 
 
   return (

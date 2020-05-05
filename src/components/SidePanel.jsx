@@ -27,10 +27,13 @@ function SidePanel({handleClickOnSolve, handleClickOnGenerate, handleClickOnLoad
             <div className="side-panel-container">
 
             
-
+                <div className="button-container button-container-clear">
+                    <button onClick={handleClickOnClearAll}>CLEAR ALL</button>
+                </div>
+              
                 <div className="button-container button-container-generate">
                     <h3 >Generator</h3>
-                    <button onClick={handleClickOnLoadValues}>Load default values</button>
+                    {/* <button onClick={handleClickOnLoadValues}>Load default values</button> */}
                     <button onClick={() => { handleClickOnGenerate(true, 20) }}>Generate grid Easy</button>
                     <button onClick={() => { handleClickOnGenerate(true, 35) }}>Generate grid Medium</button>
                     <button onClick={() => { handleClickOnGenerate(true, 50) }}>Generate grid Hard</button>
@@ -48,10 +51,7 @@ function SidePanel({handleClickOnSolve, handleClickOnGenerate, handleClickOnLoad
                     { DivCellInfo}
                 </div>
 
-                <div className="button-container button-container-clear">
-                    <button onClick={handleClickOnClearAll}>CLEAR ALL</button>
-                </div>
-              
+           
            </div>
               
         </div>
