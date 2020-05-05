@@ -9,7 +9,7 @@ import SidePanel from './components/SidePanel';
 import './styles/App.scss';
 
 let history = [];
-
+let clearGrid = false;
 function App() {
 
   const [cells, setCells] = useState([]);
@@ -21,13 +21,17 @@ function App() {
 
   useInterval(() => {
     Tick()
-  }, 20);
+  }, 10);
 
   
   const Tick = () => {
-
     // PLAY HISTORY
-    if(history.length > 0){
+    if(clearGrid){
+      setCells(ClearGridValues(cells));
+      clearGrid = false;
+      console.log("clear");
+    }
+    else if(history.length > 0){
       const newCells = [...cells];
 
       newCells[history[0].key].setSolvedValue(history[0].solvedValue);
@@ -41,7 +45,12 @@ function App() {
  
    
   const addToHistory = (_newStep) =>{
-    history = history.concat(_newStep);
+    if(_newStep === -1){
+      history = [];
+    }
+    else{
+      history = history.concat(_newStep);
+    }
   }
 
   useEffect(() => {
@@ -92,8 +101,8 @@ function App() {
 
 
   const handleClickOnSolve = (stepByStep = false) => {
+    
     const solverResult = Solver.solveGrid([ ...cells], addToHistory, stepByStep)
-
     if(!stepByStep){
       setCells(solverResult[0]);
     }
@@ -101,10 +110,14 @@ function App() {
   }
 
   const handleClickOnGenerate = (stepByStep, difficulty) => {
-    let generatedGrid = GridFunc.cloneGrid(cells);
-    generatedGrid = ClearGridValues(generatedGrid);
-    Solver.generateAGrid(cells, addToHistory, true, difficulty);
-    if(generatedGrid && !stepByStep) setCells(generatedGrid);
+    //handleClickOnClearAll();
+    clearGrid = true;
+    setTimeout(() => {
+      let generatedGrid = GridFunc.cloneGrid(cells);
+      generatedGrid = Solver.generateAGrid(generatedGrid, addToHistory, true, difficulty);
+      if(generatedGrid && !stepByStep) setCells(generatedGrid);
+    },100);
+
 
 
   }

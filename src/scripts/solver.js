@@ -207,44 +207,72 @@ export const recursiveValidationStepByStep = (_cells, key, addToHistory) => {
 }
 
 
+let loopCount;
+const maxLoop = 800;
 export const generateAGrid = (_cells, addToHistory, stepByStep, nbOfCellToHide = 50) => {
-    let newCells = GridFunc.cloneGrid(_cells);
-
-    const cellsToHide = getRandomCellKeysToHide(nbOfCellToHide);
-    generatorStepByStep(newCells, 0, addToHistory, cellsToHide);
-
+    let newCells = [];
+    
+    let tentatives = 0;
+    while(tentatives < 100){
+        tentatives ++;
+        loopCount = 0;
+        newCells = GridFunc.cloneGrid(_cells);
+        const cellsToHide = getRandomCellKeysToHide(nbOfCellToHide);
+        const res = generatorStepByStep(newCells, 0, addToHistory, cellsToHide);
+        console.log("loop count : ", loopCount, "tentatives : ", tentatives, cellsToHide.length);
+        if(loopCount > maxLoop || !res){
+            addToHistory(-1)
+        } //retry
+        else{
+            console.log("loop count : ", loopCount, "tentatives : ", tentatives, res);
+            return
+        } // success
+    }
     return newCells;
 }
 
-
 export const generatorStepByStep = (_cells, key, addToHistory, cellsToHide) => {
-    const tempCells = [ ..._cells];
-
+    //const tempCells = [ ..._cells];
+    loopCount ++;
+    if(loopCount > maxLoop) {
+        return false;
+    }
+    if (loopCount > maxLoop + 100 )throw new Error("Error while generating the grid");
     const useGuessedValues = true;
     //console.log("key : ", key);
     if (key >= 9 * 9) { return true }  //Solving finished
 
-    const currentCell = tempCells[key];
-    if (currentCell.actualValue > 0 || (useGuessedValues && currentCell.guessedValue > 0)) {
+    const currentCell = _cells[key];
+    //console.log(currentCell);
+    //console.log(currentCell.solvedValue);
+
+    const cellValue = (
+        currentCell.solvedValue > 0 
+        || currentCell.actualValue > 0 
+        || (useGuessedValues && currentCell.guessedValue > 0)
+    )
+    //console.log(cellValue);
+
+    if (cellValue) {
         // this cell is already solved, go to next cell
         return generatorStepByStep(_cells, key + 1, addToHistory, cellsToHide);
     }
-
-    if(cellsToHide.indexOf(key) !== -1){
-        return generatorStepByStep(_cells, key + 1, addToHistory, cellsToHide);
-    }
-
 
     const pValues = getPossibleValuesForCell(_cells, currentCell);
     let allValuesShuffled = shuffle([1,2,3,4,5,6,7,8,9]);
     for (let v = 1; v <= 9; v++) {
         if (pValues.some(e=> e === allValuesShuffled[v-1])){
-            currentCell.setSolvedValue(allValuesShuffled[v-1])
-            addToHistory( {
-                key:currentCell.key,
-                actualValue:allValuesShuffled[v-1]
-            } )
-
+            if(cellsToHide.indexOf(key) !== -1){
+                currentCell.actualValue = allValuesShuffled[v-1];
+            }
+            else{
+                currentCell.setSolvedValue(allValuesShuffled[v-1])
+                addToHistory( {
+                    key:currentCell.key,
+                    solvedValue:allValuesShuffled[v-1]
+                } )
+            }
+        
             // try to resolve the rest of the array with this value for the current cell
             if ( generatorStepByStep (_cells, key+1, addToHistory, cellsToHide) )
                 return true; 
@@ -255,9 +283,8 @@ export const generatorStepByStep = (_cells, key, addToHistory, cellsToHide) => {
     currentCell.setSolvedValue(0) // no value possible for this cell, reset it to 0.
     addToHistory( {
         key:currentCell.key,
-        actualValue:0
+        solvedValue:0
     } )
-
     return false // this grill is not solvable, going back to previous recursion.
 }
 
@@ -274,13 +301,47 @@ export const generatorStepByStep = (_cells, key, addToHistory, cellsToHide) => {
     
     
     const getRandomCellKeysToHide = (nbOfCellToHide) => {
-        if(!nbOfCellToHide || nbOfCellToHide >= 9*9) {return}
+        if(!nbOfCellToHide || nbOfCellToHide >= 9*9-1) {return}
         const hide = [];
         while(hide.length < nbOfCellToHide){
-            let r = Math.floor(Math.random() * 100) + 1;
+            let r = Math.floor(Math.random() * (9*9-1)) ;
             if(hide.indexOf(r) === -1) hide.push(r);
         }
         return hide;
     }
 
 
+
+/*
+    const fillSquare = (cornerLeftKey) => {
+        let values = shuffle([1,2,3,4,5,6,7,8,9]);
+        const [x,y] = GridFunc.KeyToCoord(cornerLeftKey);
+        
+        let keys = [ 
+            GridFunc.coordToKey(x+0,y+0), GridFunc.coordToKey(x+1,y+0), GridFunc.coordToKey(x+2,y+0),
+            GridFunc.coordToKey(x+0,y+1), GridFunc.coordToKey(x+1,y+1), GridFunc.coordToKey(x+2,y+1),
+            GridFunc.coordToKey(x+0,y+2), GridFunc.coordToKey(x+1,y+2), GridFunc.coordToKey(x+2,y+2)
+
+        ]
+        return [keys, values];
+    }
+
+    const fillThreeSquares = () => {
+        let keys = [];
+        let values = [];
+        const [keyA, valA] = fillSquare(0);
+        const [keyB, valB] = fillSquare(30);
+        const [keyC, valC] = fillSquare(60);
+        keys.concat(keyA, keyB, keyC);
+        values.concat(valA, valB, valC);
+        return [keys, values];
+    }
+    const generateBaseGridForGenerator = (_cells) => {
+        const[keys, values] = fillThreeSquares();
+
+        keys.forEach((key, i) =>{
+            _cells[key].solvedValue = values[i]
+        })
+    }
+
+*/
