@@ -113,3 +113,13 @@ export const returnSquareCells = (cells, cell) => {
 }
 
 
+export const saveGrid = (_cells) => {
+    const gridToSave = [9*9];
+
+    _cells.forEach(cell => {
+        gridToSave[cell.key] = cell.solvedValue;
+    })
+
+    console.log(gridToSave);
+    return gridToSave;
+}

@@ -1,12 +1,12 @@
 import * as GridFunc from './gridFunctions.js';
 
 let loopCount;
-const maxLoop = 500;
+const maxLoop = 300;
 export const generateAGrid = (_cells, addToHistory, stepByStep, nbOfCellToHide = 10) => {
     let newCells = [];
     
     let tentatives = 0;
-    while(tentatives < 300){
+    while(tentatives < 3){
         tentatives ++;
         loopCount = 0;
         newCells = GridFunc.cloneGrid(_cells);
@@ -17,7 +17,7 @@ export const generateAGrid = (_cells, addToHistory, stepByStep, nbOfCellToHide =
             addToHistory(-1)
         } //retry
         else{
-            console.log("loop count : ", loopCount, "tentatives : ", tentatives, res);
+            console.log("loop count : ", loopCount, "tentatives : ", tentatives, "res : ", res);
             return
         } // success
     }
@@ -27,9 +27,21 @@ export const generateAGrid = (_cells, addToHistory, stepByStep, nbOfCellToHide =
 
 export const solveGrid = (_cells, addToHistory = null, stepByStep = false) =>{
     let newCells = GridFunc.cloneGrid(_cells);
-    
-    let res = generatorStepByStep(newCells, 0, addToHistory, [], stepByStep);
-    
+    let res = false;
+
+    if(!checkIfGridIsValid(_cells)){console.log('grid not valid')};
+
+    let tentatives = 0;
+
+    while(!res && tentatives < 50){
+        loopCount = 0;
+        tentatives++;
+        newCells = GridFunc.cloneGrid(_cells);
+        res = generatorStepByStep(newCells, 0, addToHistory, [], stepByStep);
+    }
+    console.log("loop count : ", loopCount ,"tentatives : ", tentatives, "res : ", res);
+
+    if(!res){GridFunc.saveGrid(newCells)}
     const resString = res ? "Success" : "Error"
     return [newCells, resString];
 }
@@ -40,6 +52,7 @@ export const generatorStepByStep = (_cells, key, addToHistory, cellsToHide, step
     if(loopCount > maxLoop) {
         return false;
     }
+    if(!checkIfGridIsValid(_cells)){console.log('grid not valid')};
     if (loopCount > maxLoop + 100 )throw new Error("Error while generating the grid");
     const useGuessedValues = true;
 
@@ -51,6 +64,8 @@ export const generatorStepByStep = (_cells, key, addToHistory, cellsToHide, step
         || currentCell.actualValue > 0 
         || (useGuessedValues && currentCell.guessedValue > 0)
     )
+
+    
 
     // this cell is already solved, go to next cell
     if (cellValue) {return generatorStepByStep(_cells, key + 1, addToHistory, cellsToHide, stepByStep); }
@@ -71,6 +86,32 @@ export const generatorStepByStep = (_cells, key, addToHistory, cellsToHide, step
     return false // this grill is not solvable, going back to previous recursion.
 }
 
+
+
+
+export const checkIfGridIsValid = (_cells) => {
+    let res = true;
+    _cells.forEach(cell =>{
+        const pValues = getPossibleValuesForCell(_cells, cell,  true);
+        /*
+        if (pValues.length === 0 ) {
+            console.log("No possible value for cell : ", cell.key);
+            res = false;
+        }*/
+      
+        let cellValue = 0;
+        if (cell.actualValue > 0) {cellValue = cell.actualValue}
+        else if (cell.solvedValue > 0) {cellValue = cell.solvedValue}
+        else if (cell.guessedValue > 0) {cellValue = cell.guessedValue}
+        if (cellValue > 0 && pValues.indexOf(cellValue) === -1){ // if there is more than one cell with the same value
+            console.log("Wrong grid values for cell : ", cell.key);
+            res = false;
+        
+        }
+    })
+
+    return res;
+}
 
 
 //**********************   Utilities  **************************************/

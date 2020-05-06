@@ -9,7 +9,10 @@ import '../styles/SidePanel.scss';
 
 
 
-function SidePanel({handleClickOnSolve, handleClickOnGenerate, handleClickOnLoadValues, handleClickOnClearAll, solverResult, cellInfo}) {
+function SidePanel({
+    handleClickOnSolve, handleClickOnGenerate,
+     handleClickOnLoadValues, handleClickOnClearAll, 
+     solverResult, cellInfo, displayMessage}) {
     
     let DivCellInfo = "";
     if(Object.keys(cellInfo).length > 0){
@@ -21,6 +24,14 @@ function SidePanel({handleClickOnSolve, handleClickOnGenerate, handleClickOnLoad
         )
     }
     
+    let DivDisplayMessage = "";
+    if(displayMessage !== ""){
+        DivDisplayMessage = (
+            <div className="user-message">
+                <p><b>{displayMessage}</b></p>
+            </div>
+        )
+    }
     
     return (
         <div className="side-panel">
@@ -35,8 +46,8 @@ function SidePanel({handleClickOnSolve, handleClickOnGenerate, handleClickOnLoad
                     <h3 >Generator</h3>
                     {/* <button onClick={handleClickOnLoadValues}>Load default values</button> */}
                     <button onClick={() => { handleClickOnGenerate(true, 20) }}>Generate grid Easy</button>
-                    <button onClick={() => { handleClickOnGenerate(true, 35) }}>Generate grid Medium</button>
-                    <button onClick={() => { handleClickOnGenerate(true, 50) }}>Generate grid Hard</button>
+                    <button onClick={() => { handleClickOnGenerate(true, 30) }}>Generate grid Medium</button>
+                    <button onClick={() => { handleClickOnGenerate(true, 40) }}>Generate grid Hard</button>
 
                 </div>
 
@@ -48,9 +59,15 @@ function SidePanel({handleClickOnSolve, handleClickOnGenerate, handleClickOnLoad
                 </div>
 
                 <div className="cell-info-container">
+                    { DivDisplayMessage}
+
                     { DivCellInfo}
                 </div>
 
+                <div className="fixed-bottom-right">
+                    <a href="https://github.com/yohanlb/Sudoku" 
+                    target="_blank" rel="noopener noreferrer">See code</a>
+                </div>
            
            </div>
               

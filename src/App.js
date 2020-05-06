@@ -13,7 +13,7 @@ let clearGrid = false;
 function App() {
 
   const [cells, setCells] = useState([]);
-  const [solverResult, setSolverResult] = useState("");
+  const [displayMessage, setDisplayMessage] = useState("");
   const [cellInfo, setCellInfo] = useState({});
 
 
@@ -92,38 +92,66 @@ function App() {
     });
     return newCells
   }
+
+
+/***************** HANDLE CLICKS ****************/
+
   const handleClickOnClearAll = () =>{
     setCells(ClearGridValues(cells));
   }
   const handleClickOnLoadValues = () =>{
-    setCells(LoadGridValues(cells, GridValues.arrayA));
+    setCells(LoadGridValues(cells, GridValues.arrayError));
   }
 
 
   const handleClickOnSolve = (stepByStep = false) => {
-      
+    if(!Solver.checkIfGridIsValid(cells)){
+      setDisplayMessage("Grid is not valid, please check your values");
+       return;
+    };
+
     const solverResult = Solver.solveGrid(GridFunc.cloneGrid(cells), addToHistory, stepByStep)
     if(!stepByStep){
       setCells(solverResult[0]);
     }
-    setSolverResult(solverResult[1]);
+    setDisplayMessage(solverResult[1]);
+    
   }
 
   const handleClickOnGenerate = (stepByStep, difficulty) => {
+    if(!Solver.checkIfGridIsValid(cells)){
+      setDisplayMessage("Grid is not valid, please check your values");
+       return;
+    };
+
       let generatedGrid = GridFunc.cloneGrid(cells);
       generatedGrid = Solver.generateAGrid(generatedGrid, addToHistory, true, difficulty);
       if(generatedGrid && !stepByStep) setCells(generatedGrid);
-
+      setDisplayMessage("Grid generated with success");
   }
 
-  const handleMouseLeaveGrid = () => {
-    setCellInfo({});
-    const newCells = GridFunc.cloneGrid(cells);
-    newCells.forEach(cell=> {
-      cell.setHovered(false);
-    })
-    setCells(newCells);
+  
+  const handleClickOnCell = (event, _key, isRightClick = false) => {
+    event.preventDefault();
+    let newCells = GridFunc.cloneGrid(cells);
+
+    let clickedCell = newCells[_key];
+
+    if (clickedCell != null) {
+      //calc new cell value
+      let newCellValue = clickedCell.guessedValue + (isRightClick ? -1 : 1);
+      newCellValue < 0 && (newCellValue = 9);
+      newCellValue > 9 && (newCellValue = 0);
+
+      //assign the new cell value and update de main array;
+      clickedCell.setGuessedValue(newCellValue);
+      setCells(newCells);
+  
+    }
   }
+
+  /************** HANDLE MOUSE OVER *****************/
+
 
   const handleMouseOver = (_cellKey) =>{
     let newCells = GridFunc.cloneGrid(cells);
@@ -145,24 +173,18 @@ function App() {
     
   }
 
-  const handleClickOnCell = (event, _key, isRightClick = false) => {
-    event.preventDefault();
-    let newCells = GridFunc.cloneGrid(cells);
-
-    let clickedCell = newCells[_key];
-
-    if (clickedCell != null) {
-      //calc new cell value
-      let newCellValue = clickedCell.guessedValue + (isRightClick ? -1 : 1);
-      newCellValue < 0 && (newCellValue = 9);
-      newCellValue > 9 && (newCellValue = 0);
-
-      //assign the new cell value and update de main array;
-      clickedCell.setGuessedValue(newCellValue);
-      setCells(newCells);
-  
-    }
+  const handleMouseLeaveGrid = () => {
+    setCellInfo({});
+    const newCells = GridFunc.cloneGrid(cells);
+    newCells.forEach(cell=> {
+      cell.setHovered(false);
+    })
+    setCells(newCells);
   }
+
+
+
+/************* RENDER ******************/
 
 
   return (
@@ -190,11 +212,10 @@ function App() {
         handleClickOnGenerate={handleClickOnGenerate}
         handleClickOnClearAll={handleClickOnClearAll}
         handleClickOnLoadValues={handleClickOnLoadValues}
-        solverResult={solverResult}
+        displayMessage={displayMessage}
       />
    
-      {/* <PossibleValues possibleValues={possibleValues}/> */}
-
+      
     </div>
   );
 }
