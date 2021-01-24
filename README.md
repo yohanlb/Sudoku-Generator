@@ -1,6 +1,5 @@
-Sudoku generator and solver
+Sudoku generator and solver made with React
 
-made with React
+### [Live Demo](https://yohanlb.github.io/Sudoku)
 
-### [Demo](https://yohanlb.github.io/Sudoku)
-
+![Gif](sudoku.gif)
