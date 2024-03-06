@@ -1,5 +1,5 @@
 Sudoku generator and solver made with React
 
-### [Live Demo](https://yohanlb.github.io/Sudoku)
+### [Live Demo](https://sudoku-generator-yohanlb.vercel.app/)
 
 ![Gif](sudoku.gif)
